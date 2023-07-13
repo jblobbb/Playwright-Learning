@@ -11,23 +11,20 @@ test.beforeAll( async ()=>
    const loginResponse = await apiContext.post("https://rahulshettyacademy.com/api/ecom/auth/login", {data:loginPayLoad});
    expect(( loginResponse).ok).toBeTruthy();
    const loginResponseJson = await loginResponse.json();
-   const token = loginResponseJson.token;
+   token = loginResponseJson.token;
    console.log(token);
 });
 
 
-test('Demo signup test', async ({page})=> {
+test('Place the order', async ({page})=> { 
     
-    
-    // await page.goto("https://rahulshettyacademy.com/client/");
-    // await page.locator("#userEmail").fill(email);
-    // await page.locator("#userPassword").type("Password10");
-    // await page.locator("[value='Login']").click();
-    // await page.waitForLoadState('networkidle');
-    
+    page.addInitScript(value => {
+        window.localStorage.setItem('token', value);
+    }, token);
+
     const productName = 'adidas original';
     const products = page.locator(".card-body");
-    const email = "johnzoooo@gmail.com";
+    await page.goto("https://rahulshettyacademy.com/client/");
     const titles = await page.locator(".card-body b").allTextContents();
     
     //get ADIDAS ORIGINAL
@@ -71,7 +68,7 @@ test('Demo signup test', async ({page})=> {
     }
 
     //check email for login is displayed in shipping info then submit
-    await expect(page.locator(".user__name label[type = 'text']")).toHaveText(email);
+    await expect(page.locator(".user__name label[type = 'text']")).toHaveText(loginPayLoad.userEmail);
     await page.locator(".action__submit").click();
 
     //check order is complete text and get order number
