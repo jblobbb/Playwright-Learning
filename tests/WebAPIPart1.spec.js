@@ -1,41 +1,23 @@
 import { test, expect, request } from '@playwright/test';
+const {APIutils} = require('./utils/APIutils');
 
 const loginPayLoad = {userEmail: "johnzoooo@gmail.com", userPassword: "Password10"};
-const orderPayLoad = {orders: [{country: "Cuba", productOrderedId: "6262e990e26b7e1a10e89bfa"}]}
+const orderPayLoad = {orders: [{country: "Cuba", productOrderedId: "6262e95ae26b7e1a10e89bf0"}]}
 
-let token;
-let orderId;
-
+let response;
 
 test.beforeAll( async ()=>
 {
-   //login using API request
    const apiContext = await request.newContext();
-   const loginResponse = await apiContext.post("https://rahulshettyacademy.com/api/ecom/auth/login", {data:loginPayLoad});
-   expect(( loginResponse).ok).toBeTruthy();
-   const loginResponseJson = await loginResponse.json();
-   token = loginResponseJson.token;
-   console.log(token);
-
-   //create order API
-   const orderResponse = await apiContext.post("https://rahulshettyacademy.com/api/ecom/order/create-order", {
-    data : orderPayLoad,
-    headers : {
-        'Authorization' : token,
-        'Content-Type' : 'application/json'
-    },
-   });
-   const orderResponseJson = await orderResponse.json();
-   console.log(orderResponseJson);
-   orderId = orderResponseJson.orders[0];
+   const apiUtils = new APIutils(apiContext, loginPayLoad);
+   response = await apiUtils.createOrder(orderPayLoad);
 });
 
 
 test('Place the order', async ({page})=> { 
-    
     page.addInitScript(value => {
         window.localStorage.setItem('token', value);
-    }, token);
+    }, response.token);
 
     await page.goto("https://rahulshettyacademy.com/client/");
 
@@ -46,7 +28,7 @@ test('Place the order', async ({page})=> {
     
     for (let i = 0; i < await rows.count(); i++) {
         const rowOrderId = await rows.nth(i).locator("th").textContent();
-        if (orderId.includes(rowOrderId)) {
+        if (response.orderId.includes(rowOrderId)) {
             await rows.nth(i).locator("button").first().click();
             break;
         }
@@ -54,7 +36,7 @@ test('Place the order', async ({page})=> {
 
     const orderIdDetails = await page.locator(".col-text").textContent();
     await page.pause();
-    expect(orderId.includes(orderIdDetails)).toBeTruthy();
+    expect(response.orderId.includes(orderIdDetails)).toBeTruthy();
 });
 
 //Verify if order created is showing in history page
