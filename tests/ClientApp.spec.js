@@ -76,6 +76,4 @@ test('Demo signup test', async ({page})=> {
 
     const orderIdDetails = await page.locator(".col-text").textContent();
     expect(orderId.includes(orderIdDetails)).toBeTruthy();
-
-    await page.pause();
 });
