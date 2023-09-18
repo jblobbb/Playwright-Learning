@@ -32,7 +32,7 @@ module.exports = defineConfig({
     headless : false,
     screenshot : 'on',
     
-  },
+  },                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
 
   /* Configure projects for major browsers */
   projects: [
