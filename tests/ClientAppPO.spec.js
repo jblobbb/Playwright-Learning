@@ -1,14 +1,17 @@
 const {test, expect} = require('@playwright/test');
+const {LoginPage} = require('../pageobjects/LoginPage').default;
 
-test('Demo signup test', async ({page})=> {
+test.only('Demo signup test', async ({page})=> {
     //js file-Login 
     const productName = 'adidas original';
     const products = page.locator(".card-body");
-    const email = "johnzoooo@gmail.com";
-    await page.goto("https://rahulshettyacademy.com/client/");
-    await page.locator("#userEmail").fill(email);
-    await page.locator("#userPassword").type("Password10");
-    await page.locator("[value='Login']").click();
+    const username = "johnzoooo@gmail.com";
+    const password = "Password10";
+    const loginPage = new LoginPage(page);
+
+    loginPage.goTo();
+    loginPage.validLogin(username, password);
+
     await page.waitForLoadState('networkidle');
     const titles = await page.locator(".card-body b").allTextContents();
     
@@ -53,7 +56,7 @@ test('Demo signup test', async ({page})=> {
     }
 
     //check email for login is displayed in shipping info then submit
-    await expect(page.locator(".user__name label[type = 'text']")).toHaveText(email);
+    await expect(page.locator(".user__name label[type = 'text']")).toHaveText(username);
     await page.locator(".action__submit").click();
 
     //check order is complete text and get order number
