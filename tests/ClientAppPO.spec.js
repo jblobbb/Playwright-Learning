@@ -1,5 +1,6 @@
 const {test, expect} = require('@playwright/test');
 const {LoginPage} = require('../pageobjects/LoginPage').default;
+const {DashboardPage} = require('../pageobjects/DashboardPage').default;
 
 test.only('Demo signup test', async ({page})=> {
     //js file-Login 
@@ -8,25 +9,13 @@ test.only('Demo signup test', async ({page})=> {
     const username = "johnzoooo@gmail.com";
     const password = "Password10";
     const loginPage = new LoginPage(page);
+    const dashboardPage = new DashboardPage(page);
 
-    loginPage.goTo();
-    loginPage.validLogin(username, password);
-
-    await page.waitForLoadState('networkidle');
-    const titles = await page.locator(".card-body b").allTextContents();
-    
-    //get ADIDAS ORIGINAL
-    const count = await products.count();
-    for (let i = 0; i < count; i++) 
-    {
-        if (await products.nth(i).locator("b").textContent() === productName) {
-            //add to cart
-            await products.nth(i).locator("text = Add To Cart").click();
-            break;
-        }    
-    }
-
-    await page.locator("[routerlink*='cart']").click();
+    await loginPage.goTo();
+    await loginPage.validLogin(username, password);
+    await dashboardPage.searchProductAddCart(productName);
+    await dashboardPage.navigateToCart();
+    await page.pause();
 
     //wait for cart to be visible then check text is visible
     await page.locator("div li").first().waitFor();
