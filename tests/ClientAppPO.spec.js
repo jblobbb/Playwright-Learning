@@ -1,6 +1,7 @@
 const {test, expect} = require('@playwright/test');
 const {LoginPage} = require('../pageobjects/LoginPage').default;
 const {DashboardPage} = require('../pageobjects/DashboardPage').default;
+const {CartPage} = require('../pageobjects/CartPage').default;
 
 test.only('Demo signup test', async ({page})=> {
     //js file-Login 
@@ -10,20 +11,18 @@ test.only('Demo signup test', async ({page})=> {
     const password = "Password10";
     const loginPage = new LoginPage(page);
     const dashboardPage = new DashboardPage(page);
+    const cartPage = new CartPage(page);
 
     await loginPage.goTo();
     await loginPage.validLogin(username, password);
     await dashboardPage.searchProductAddCart(productName);
     await dashboardPage.navigateToCart();
+
+    //wait for cart to be visible then check text is visible, select checkout
+    await cartPage.checkProductIsVisable(productName);
+    await cartPage.clickCheckOutButton();
     await page.pause();
-
-    //wait for cart to be visible then check text is visible
-    await page.locator("div li").first().waitFor();
-    const bool = page.locator("h3:has-text('adidas original')").isVisible();
-    expect(bool).toBeTruthy();
-
-    //select checkout and enter card details
-    await page.locator("text = Checkout").click();
+    //enter card details
     const month = page.locator("(//select[@class='input ddl'])[1]");
     await month.selectOption("03");
     const year = page.locator("(//select[@class='input ddl'])[2]");
