@@ -2,6 +2,7 @@ const {test, expect} = require('@playwright/test');
 const {LoginPage} = require('../pageobjects/LoginPage').default;
 const {DashboardPage} = require('../pageobjects/DashboardPage').default;
 const {CartPage} = require('../pageobjects/CartPage').default;
+const {CheckoutPage} = require('../pageobjects/CheckoutPage').default;
 
 test.only('Demo signup test', async ({page})=> {
     //js file-Login 
@@ -9,9 +10,16 @@ test.only('Demo signup test', async ({page})=> {
     const products = page.locator(".card-body");
     const username = "johnzoooo@gmail.com";
     const password = "Password10";
+    const month = "03";
+    const year = "25";
+    const securityNumber = "123";
+    const cardName = "Jonzo";
+    const country = " United Kingdom"
+
     const loginPage = new LoginPage(page);
     const dashboardPage = new DashboardPage(page);
     const cartPage = new CartPage(page);
+    const checkoutPage = new CheckoutPage(page);
 
     await loginPage.goTo();
     await loginPage.validLogin(username, password);
@@ -21,27 +29,12 @@ test.only('Demo signup test', async ({page})=> {
     //wait for cart to be visible then check text is visible, select checkout
     await cartPage.checkProductIsVisable(productName);
     await cartPage.clickCheckOutButton();
-    await page.pause();
+    
     //enter card details
-    const month = page.locator("(//select[@class='input ddl'])[1]");
-    await month.selectOption("03");
-    const year = page.locator("(//select[@class='input ddl'])[2]");
-    await year.selectOption("25");
-    await page.locator("(//input[@type='text'])[2]").fill("123");
-    await page.locator("(//input[@type='text'])[3]").fill("Jonzo");
-
-    //select country from dropdown
-    await page.locator("[placeholder*='Country']").type("uni", {delay:100});
-    const dropdown = page.locator(".ta-results");
-    await dropdown.waitFor();
-    let optionsCount = await dropdown.locator("button").count();
-    for (let i = 0; i < optionsCount; i++) {
-        let text = await dropdown.locator("button").nth(i).textContent();
-        if(text === " United Kingdom"){
-            await dropdown.locator("button").nth(i).click();
-            break;
-        }      
-    }
+    await checkoutPage.enterDate(month, year);
+    await checkoutPage.enterSecurityNumber(securityNumber);
+    await checkoutPage.enterNameOnCard(cardName);
+    await checkoutPage.selectCountry(country);
 
     //check email for login is displayed in shipping info then submit
     await expect(page.locator(".user__name label[type = 'text']")).toHaveText(username);
