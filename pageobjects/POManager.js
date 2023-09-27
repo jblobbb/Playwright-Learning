@@ -3,6 +3,7 @@ const {DashboardPage} = require('../pageobjects/DashboardPage').default;
 const {CartPage} = require('../pageobjects/CartPage').default;
 const {CheckoutPage} = require('../pageobjects/CheckoutPage').default;
 const {OrderComplete} = require('../pageobjects/OrderComplete').default;
+const {OrderHistoryPage} = require('../pageobjects/OrderHistoryPage').default;
 
 class POManager{
     constructor(page){
@@ -12,6 +13,7 @@ class POManager{
         this.cartPage = new CartPage(page);
         this.checkoutPage = new CheckoutPage(page);
         this.orderCompletePage = new OrderComplete(page);
+        this.orderHistoryPage = new OrderHistoryPage(page);
     }
 
     getLoginPage(){
@@ -32,6 +34,10 @@ class POManager{
 
     getOrderCompletePage(){
         return this.orderCompletePage;
+    }
+
+    getOrderHistoryPage(){
+        return this.orderHistoryPage;
     }
 
 } export default{POManager};
