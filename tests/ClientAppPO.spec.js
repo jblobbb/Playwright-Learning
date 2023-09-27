@@ -1,8 +1,5 @@
 const {test, expect} = require('@playwright/test');
-const {LoginPage} = require('../pageobjects/LoginPage').default;
-const {DashboardPage} = require('../pageobjects/DashboardPage').default;
-const {CartPage} = require('../pageobjects/CartPage').default;
-const {CheckoutPage} = require('../pageobjects/CheckoutPage').default;
+const {POManager} = require('../pageobjects/POManager').default;
 
 test.only('Demo signup test', async ({page})=> {
     //js file-Login 
@@ -14,12 +11,17 @@ test.only('Demo signup test', async ({page})=> {
     const year = "25";
     const securityNumber = "123";
     const cardName = "Jonzo";
-    const country = " United Kingdom"
+    const country = " United Kingdom";
+    const successMessage = " Thankyou for the order. ";
 
-    const loginPage = new LoginPage(page);
-    const dashboardPage = new DashboardPage(page);
-    const cartPage = new CartPage(page);
-    const checkoutPage = new CheckoutPage(page);
+
+    const poManager = new POManager(page);
+
+    const loginPage = poManager.getLoginPage();
+    const dashboardPage = poManager.getDashboardPage();
+    const cartPage = poManager.getCartPage();
+    const checkoutPage = poManager.getCheckoutPage();
+    const orderCompletePage = poManager.getOrderCompletePage();
 
     await loginPage.goTo();
     await loginPage.validLogin(username, password);
@@ -30,18 +32,19 @@ test.only('Demo signup test', async ({page})=> {
     await cartPage.checkProductIsVisable(productName);
     await cartPage.clickCheckOutButton();
     
-    //enter card details
+    //enter card details submit order
     await checkoutPage.enterDate(month, year);
     await checkoutPage.enterSecurityNumber(securityNumber);
     await checkoutPage.enterNameOnCard(cardName);
     await checkoutPage.selectCountry(country);
+    await checkoutPage.checkUsernameIsVisable(username);
+    await checkoutPage.submitPurchase();
 
-    //check email for login is displayed in shipping info then submit
-    await expect(page.locator(".user__name label[type = 'text']")).toHaveText(username);
-    await page.locator(".action__submit").click();
+    
 
     //check order is complete text and get order number
-    await expect(page.locator(".hero-primary")).toHaveText(" Thankyou for the order. ");
+    await orderCompletePage.checkSuccessMessage(successMessage);
+    await page.pause();
     const orderId = await page.locator(".em-spacer-1 .ng-star-inserted").textContent();
     console.log(orderId);
 

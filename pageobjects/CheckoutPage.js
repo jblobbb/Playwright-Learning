@@ -1,3 +1,5 @@
+const { expect } = require("@playwright/test");
+
 class CheckoutPage{
 
     constructor(page){
@@ -7,6 +9,8 @@ class CheckoutPage{
         this.securityNumber = page.locator("(//input[@type='text'])[2]");
         this.cardName = page.locator("(//input[@type='text'])[3]");
         this.country = page.locator("[placeholder*='Country']");
+        this.emailID = page.locator(".user__name [type = 'text']").first();
+        this.submitButton = page.locator(".action__submit");
     }
 
     async enterDate(month, year){
@@ -36,6 +40,14 @@ class CheckoutPage{
                 break;
             }      
         }
+    }
+
+    async checkUsernameIsVisable(username){
+        await expect(this.emailID).toHaveText(username);
+    }
+
+    async submitPurchase(){
+        await this.submitButton.click();
     }
 }
 export default{CheckoutPage};
